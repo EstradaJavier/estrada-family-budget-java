@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;   // ← THIS IMPORT FIXES THE ERROR
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -19,9 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javafx.scene.shape.Line;
-
 
 public class App extends Application {
 
@@ -73,7 +71,6 @@ public class App extends Application {
         // Summary Card
         VBox summaryCard = createCard();
         summaryLabel = new Label();
-        summaryLabel.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
         updateSummaryDisplay();
         summaryCard.getChildren().add(summaryLabel);
         content.getChildren().add(summaryCard);
@@ -172,9 +169,12 @@ public class App extends Application {
         });
         form.add(addButton, 1, 5);
 
-        // New buttons
+        // New buttons for bill/income
         Button addBillButton = new Button("Add New Bill");
+        addBillButton.setOnAction(e -> showInfo("Add New Bill dialog coming soon!"));
         Button addIncomeButton = new Button("Add New Income");
+        addIncomeButton.setOnAction(e -> showInfo("Add New Income dialog coming soon!"));
+
         HBox newButtons = new HBox(10, addBillButton, addIncomeButton);
         newButtons.setAlignment(Pos.CENTER);
         content.getChildren().add(newButtons);
@@ -194,16 +194,6 @@ public class App extends Application {
         primaryStage.setTitle("Estrada Family Budget");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    private String getFormattedDate() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
-        String dateStr = today.format(formatter);
-        if (today.getMonthValue() == 2 && today.getDayOfMonth() == 9) {
-            dateStr += " - Happy Birthday, Javier! 63 today 🎂";
-        }
-        return dateStr;
     }
 
     private VBox createCard() {
@@ -273,8 +263,6 @@ public class App extends Application {
 
         summaryLabel.setGraphic(summaryBox);
     }
-
-    // Pop-up methods, showError, showInfo, createCard, loadDefaultBalances, loadUpcomingPayments remain as before
 
     private void showBalancesPopUp() {
         Stage popup = new Stage();
