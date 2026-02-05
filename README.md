@@ -1,35 +1,46 @@
-# Estrada Family Budget App (Java Edition)
+# Estrada Family Budget App
 
-Desktop application for tracking family income, expenses, budgets, recurring transactions, charts, and exports.
+A personal desktop budgeting tool built for the Estrada family. Tracks income (military retirement, disability, salaries), fixed/recurring expenses (DFAS deductions, former spouse support, credit cards, loans, subscriptions, pet care), and helps prevent overdrafts with upcoming payments visibility, projected balance simulator, and paid checkboxes.
 
-## Current Status
-- Maven + Java + JavaFX skeleton
-- Directory structure set up
+## Features
+- **Monthly Summary** — Income, Expenses, Balance (vertically aligned with color coding)
+- **Current Balances** — Pop-up view (Sam’s Club, Citi, mortgage, Regions, Buckle, Cosco, AFEES, etc.)
+- **Upcoming Payments** — Pop-up with checkboxes to mark bills as paid (Regions $500, Citi min, Sam's Club min, iCloud, Tractive, SBP, TriWest, former spouse, etc.)
+- **Add Transactions** — Form for income/expense with recurring options (weekly/monthly/yearly)
+- **Projected Balance Simulator** — Test spend amounts and see impact after upcoming bills/income
+- **UI** — Centered elegant title, date + temperature header, horizontal separator, scrollable content, dark labels, modern cards with shadows
+- **Data Persistence** — JSON save/load in `~/EstradaFamilyBudget/budget.json`
+- **Reference Docs** — Git commands in `/docs/git-commands-reference.md`
 
-## Project Structure
-estrada-family-budget-java/
-├── pom.xml
-├── README.md
-├── .gitignore
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/estrada/budget/
-│   │   │       ├── app/          → App.java (JavaFX launch)
-│   │   │       ├── model/        → Transaction, Category, Budget
-│   │   │       └── util/         → JSON save/load, CSV/PDF export
-│   │   └── resources/
-│   │       ├── data/             → budget.json
-│   │       ├── css/              → style.css
-│   │       ├── images/
-│   │       └── fxml/             → future UI layouts
-│   └── test/
-└── docs/                         → notes, diagrams
+## Tech Stack
+- Java 21/25
+- JavaFX (desktop UI)
+- Maven (build & dependencies)
+- Jackson (JSON persistence)
 
-## Next Steps
-1. Add JavaFX dependencies to pom.xml
-2. Implement basic model classes
-3. Create simple JavaFX window
-4. Port recurring & summary logic from Python version
+## Setup & Run (IntelliJ on Mac)
+1. Open the project in IntelliJ IDEA
+2. Right-click `pom.xml` → **Maven** → **Reload Project** (or **Sync Project**)
+3. Build → **Rebuild Project** (Cmd + Shift + F9)
+4. In Maven tool window (right sidebar) → Plugins → javafx → double-click **run**  
+   - Or in Terminal: `mvn javafx:run` (if Maven installed globally via Homebrew)
 
-Built with Grok help 🚀
+## Branches
+- `master` — Stable working version
+- `feature/ui-enhancements` — Active improvements (current branch: UI polish, pop-ups, alerts, styling)
+
+## Screenshots
+(Add screenshots here later — e.g., main window, pop-ups, summary grid)
+
+## Development Notes
+- Data stored in `~/EstradaFamilyBudget/budget.json`
+- Balances and upcoming payments are hardcoded defaults — update in `App.java` as needed
+- Future ideas:
+  - Dynamic real-time temperature (OpenWeather API for Salado, TX)
+  - Persistent "paid" checkbox status for bills
+  - Functional "Add New Bill" / "Add New Income" dialogs
+  - CSV/PDF export
+  - Charts (pie for category spending, bar for trends)
+  - Dark mode toggle
+
+Built with help from Grok (xAI) 🚀
