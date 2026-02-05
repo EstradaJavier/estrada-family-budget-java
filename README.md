@@ -1,38 +1,46 @@
 # Estrada Family Budget App
 
-A personal/family budgeting desktop app built for the Estrada household. Tracks income (DFAS retirement, disability, salaries), recurring expenses/deductions (SBP, former spouse support, TriWest, credit cards, loans, subscriptions), and helps avoid overdrafts with projected balance and upcoming payments visibility.
+A personal desktop budgeting tool for the Estrada family. Tracks income (military retirement, disability, salaries), fixed/recurring expenses (DFAS deductions, former spouse support, credit cards, loans, subscriptions, pet care), and helps prevent overdrafts with upcoming payments visibility, projected balance simulator, and paid checkboxes.
 
 ## Features
-- **Monthly Summary**: Income, Expenses, Balance (lined up vertically with colors)
-- **Current Balances**: Pop-up view (Sam's Club, Citi, etc.)
-- **Upcoming Payments**: Pop-up with checkboxes to mark paid (Regions $500, Citi min, iCloud, Tractive, DFAS deductions, etc.)
-- **Add Transactions**: Income/Expense form with recurring options
-- **Projected Balance Simulator**: Test spends and see impact after upcoming bills
-- **UI**: Centered title, date/temp header, elegant styling, scrollable content
-- **Data Persistence**: JSON save/load in ~/EstradaFamilyBudget/budget.json
-- **Reference Docs**: Git commands in /docs folder
+- **Monthly Summary** — Income, Expenses, Balance (vertically aligned with color coding)
+- **Current Balances** — Pop-up view (Sam’s Club, Citi, mortgage, Regions, Buckle, Cosco, AFEES, etc.)
+- **Upcoming Payments** — Pop-up with checkboxes to mark bills as paid (Regions $500, Citi min, Sam's Club min, iCloud, Tractive, SBP, TriWest, former spouse, etc.)
+- **Add Transactions** — Form for income/expense with recurring options (weekly/monthly/yearly)
+- **Projected Balance Simulator** — Test spend amounts and see impact after upcoming bills/income
+- **UI** — Centered elegant title, date + temperature header, horizontal separator, scrollable content, dark labels, modern cards with shadows
+- **Data Persistence** — JSON save/load in `~/EstradaFamilyBudget/budget.json`
+- **Reference Docs** — Git commands in `/docs/git-commands-reference.md`
 
 ## Tech Stack
 - Java 21/25
-- JavaFX (UI & charts)
-- Maven (build)
+- JavaFX (desktop UI)
+- Maven (build & dependencies)
 - Jackson (JSON persistence)
 
-## Setup & Run
-1. Open in IntelliJ IDEA
-2. Right-click pom.xml → Maven → Reload Project
-3. Build → Rebuild Project (Cmd + Shift + F9)
-4. Maven tool window → Plugins → javafx → double-click run
-   - Or Terminal: mvn javafx:run (if Maven installed globally)
+## Setup & Run (IntelliJ on Mac)
+1. Open the project in IntelliJ IDEA
+2. Right-click `pom.xml` → **Maven** → **Reload Project** (or **Sync Project**)
+3. Build → **Rebuild Project** (Cmd + Shift + F9)
+4. In Maven tool window (right sidebar) → Plugins → javafx → double-click **run**  
+   - Or in Terminal: `mvn javafx:run` (if Maven installed globally via Homebrew)
 
-## Development Branches
-- `master`: Stable working version
-- `feature/ui-enhancements`: Active improvements (current branch)
+## Branches
+- `master` — Stable working version
+- `feature/ui-enhancements` — Active improvements (current branch: UI polish, pop-ups, alerts, styling)
 
 ## Screenshots
-(Add screenshots here later)
+(Add screenshots here later — e.g., main window, pop-ups, summary grid)
 
-## Contributing
-Personal project — fork or suggest ideas!
+## Development Notes
+- Data stored in `~/EstradaFamilyBudget/budget.json`
+- Balances and upcoming payments are hardcoded defaults — update in `App.java` as needed
+- Future ideas:
+  - Dynamic real-time temperature (OpenWeather API for Salado, TX)
+  - Persistent "paid" checkbox status for bills
+  - Functional "Add New Bill" / "Add New Income" dialogs
+  - CSV/PDF export
+  - Charts (pie for category spending, bar for trends)
+  - Dark mode toggle
 
 Built with help from Grok (xAI) 🚀
