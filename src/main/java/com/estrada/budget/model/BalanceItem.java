@@ -13,11 +13,18 @@ public class BalanceItem {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public double getBalance() {
         return balance;
     }
 
-    // Optional: toString for easier debugging/printing
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
     @Override
     public String toString() {
         return name + ": $" + String.format("%.2f", balance);

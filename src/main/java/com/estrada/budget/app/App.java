@@ -5,14 +5,16 @@ import com.estrada.budget.model.Transaction;
 import com.estrada.budget.model.BalanceItem;
 import com.estrada.budget.util.JsonPersistence;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Line;   // ← THIS IMPORT FIXES THE ERROR
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.shape.Line;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -44,10 +46,17 @@ public class App extends Application {
         loadDefaultBalances();
         loadUpcomingPayments();
 
-        // Header: Title + Date/Temp + Separator
+        // Header: Centered title + Date/Temp row + Separator
         Label titleLabel = new Label("Estrada Family Budget");
-        titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #001F3F; -fx-font-family: Georgia, 'Times New Roman', serif;");
-        titleLabel.setAlignment(Pos.CENTER);
+        titleLabel.setStyle(
+                "-fx-font-size: 36px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: #001F3F; " +
+                        "-fx-font-family: Georgia, 'Times New Roman', serif; " +
+                        "-fx-alignment: center; " +
+                        "-fx-text-alignment: center; " +
+                        "-fx-max-width: Infinity;"
+        );
 
         Label dateLabel = new Label(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")));
         if (LocalDate.now().getMonthValue() == 2 && LocalDate.now().getDayOfMonth() == 9) {
@@ -68,7 +77,7 @@ public class App extends Application {
         VBox content = new VBox(20);
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Summary Card
+        // Monthly Summary Card
         VBox summaryCard = createCard();
         summaryLabel = new Label();
         updateSummaryDisplay();
@@ -83,6 +92,18 @@ public class App extends Application {
         Button viewUpcomingButton = new Button("View Upcoming Payments");
         viewUpcomingButton.setOnAction(e -> showUpcomingPopUp());
         content.getChildren().add(viewUpcomingButton);
+
+        // Separator below buttons
+        Line buttonsSeparator = new Line();
+        buttonsSeparator.endXProperty().bind(primaryStage.widthProperty().subtract(40));
+        buttonsSeparator.setStyle("-fx-stroke: linear-gradient(to right, #001F3F, #2c3e50); -fx-stroke-width: 3;");
+        content.getChildren().add(buttonsSeparator);
+
+        // Heading "Pay / Add an Income"
+        Label payAddHeading = new Label("Pay / Add an Income");
+        payAddHeading.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
+        payAddHeading.setAlignment(Pos.CENTER);
+        content.getChildren().add(payAddHeading);
 
         // Transaction Input Form
         GridPane form = new GridPane();
@@ -169,16 +190,6 @@ public class App extends Application {
         });
         form.add(addButton, 1, 5);
 
-        // New buttons for bill/income
-        Button addBillButton = new Button("Add New Bill");
-        addBillButton.setOnAction(e -> showInfo("Add New Bill dialog coming soon!"));
-        Button addIncomeButton = new Button("Add New Income");
-        addIncomeButton.setOnAction(e -> showInfo("Add New Income dialog coming soon!"));
-
-        HBox newButtons = new HBox(10, addBillButton, addIncomeButton);
-        newButtons.setAlignment(Pos.CENTER);
-        content.getChildren().add(newButtons);
-
         content.getChildren().add(form);
 
         ScrollPane scrollPane = new ScrollPane(content);
@@ -237,7 +248,7 @@ public class App extends Application {
         VBox summaryBox = new VBox(10);
         summaryBox.setAlignment(Pos.CENTER);
 
-        Label title = new Label("Monthly Summary");
+        Label title = new Label("Budget Summary");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
         summaryBox.getChildren().add(title);
 
@@ -268,18 +279,114 @@ public class App extends Application {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.setTitle("Current Balances");
+        popup.setMinWidth(450);
+        popup.setMinHeight(400);
 
-        VBox popRoot = new VBox(10);
-        popRoot.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-spacing: 10;");
+        VBox popRoot = new VBox(15);
+        popRoot.setPadding(new Insets(15));
+        popRoot.setStyle("-fx-background-color: white;");
 
-        for (BalanceItem item : balances) {
-            Label line = new Label(item.getName() + ": $" + String.format("%.2f", item.getBalance()));
-            popRoot.getChildren().add(line);
-        }
+        // ListView for balances
+        ListView<BalanceItem> balanceList = new ListView<>();
+        ObservableList<BalanceItem> observableBalances = FXCollections.observableArrayList(balances);
+        balanceList.setItems(observableBalances);
 
-        Scene popScene = new Scene(popRoot, 400, 300);
+        // Custom cell factory for nicer display
+        balanceList.setCellFactory(lv -> new ListCell<BalanceItem>() {
+            @Override
+            protected void updateItem(BalanceItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getName() + ": $" + String.format("%.2f", item.getBalance()));
+                }
+            }
+        });
+
+        // Double-click to edit
+        balanceList.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && !balanceList.getSelectionModel().isEmpty()) {
+                editBalanceItem(balanceList.getSelectionModel().getSelectedItem(), observableBalances);
+            }
+        });
+
+        // Buttons at bottom
+        Button addButton = new Button("Add New Balance Item");
+        addButton.setOnAction(e -> addNewBalanceItem(observableBalances));
+
+        Button editButton = new Button("Edit Selected");
+        editButton.setDisable(true);
+        editButton.setOnAction(e -> {
+            BalanceItem selected = balanceList.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                editBalanceItem(selected, observableBalances);
+            }
+        });
+
+        balanceList.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
+            editButton.setDisable(newVal == null);
+        });
+
+        HBox buttons = new HBox(10, addButton, editButton);
+        buttons.setAlignment(Pos.CENTER);
+
+        popRoot.getChildren().addAll(
+                new Label("Current account balances (click to edit, double-click for quick edit)"),
+                balanceList,
+                buttons
+        );
+
+        Scene popScene = new Scene(popRoot, 450, 400);
         popup.setScene(popScene);
         popup.showAndWait();
+
+        balances.clear();
+        balances.addAll(observableBalances);
+    }
+
+    private void addNewBalanceItem(ObservableList<BalanceItem> observableBalances) {
+        TextInputDialog nameDialog = new TextInputDialog();
+        nameDialog.setTitle("Add New Balance Item");
+        nameDialog.setHeaderText("Enter name of new account/loan/card");
+        nameDialog.setContentText("Name:");
+
+        String name = nameDialog.showAndWait().orElse(null);
+        if (name == null || name.trim().isEmpty()) return;
+
+        TextInputDialog balanceDialog = new TextInputDialog("0.00");
+        balanceDialog.setTitle("Add Balance");
+        balanceDialog.setHeaderText("Enter current balance for " + name.trim());
+        balanceDialog.setContentText("Balance ($):");
+
+        String balanceStr = balanceDialog.showAndWait().orElse(null);
+        try {
+            double balance = Double.parseDouble(balanceStr.trim());
+            BalanceItem newItem = new BalanceItem(name.trim(), balance);
+            observableBalances.add(newItem);
+            showInfo("Added: " + name.trim() + " = $" + String.format("%.2f", balance));
+        } catch (NumberFormatException ex) {
+            showError("Invalid balance amount.");
+        }
+    }
+
+    private void editBalanceItem(BalanceItem item, ObservableList<BalanceItem> observableBalances) {
+        TextInputDialog dialog = new TextInputDialog(String.format("%.2f", item.getBalance()));
+        dialog.setTitle("Edit Balance");
+        dialog.setHeaderText("Update balance for " + item.getName());
+        dialog.setContentText("New balance ($):");
+
+        String newBalanceStr = dialog.showAndWait().orElse(null);
+        if (newBalanceStr == null) return;
+
+        try {
+            double newBalance = Double.parseDouble(newBalanceStr.trim());
+            item.setBalance(newBalance);
+            observableBalances.set(observableBalances.indexOf(item), item);
+            showInfo("Updated: " + item.getName() + " = $" + String.format("%.2f", newBalance));
+        } catch (NumberFormatException ex) {
+            showError("Invalid balance amount.");
+        }
     }
 
     private void showUpcomingPopUp() {
@@ -288,19 +395,47 @@ public class App extends Application {
         popup.setTitle("Upcoming Payments");
 
         VBox popRoot = new VBox(10);
-        popRoot.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-spacing: 10;");
+        popRoot.setPadding(new Insets(15));
+        popRoot.setStyle("-fx-background-color: white;");
+
+        // One-time payments with checkboxes
+        Label oneTimeLabel = new Label("One-time / Upcoming Bills");
+        oneTimeLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
+        popRoot.getChildren().add(oneTimeLabel);
 
         for (String payment : upcomingPayments) {
-            CheckBox checkBox = new CheckBox(payment);
-            popRoot.getChildren().add(checkBox);
-            checkBox.selectedProperty().addListener((obs, old, newVal) -> {
-                if (newVal) {
-                    showInfo("Marked as paid: " + payment);
-                }
-            });
+            if (!payment.contains("Monthly") && !payment.contains("Dec 22, 2027")) {
+                CheckBox checkBox = new CheckBox(payment);
+                popRoot.getChildren().add(checkBox);
+                checkBox.selectedProperty().addListener((obs, old, newVal) -> {
+                    if (newVal) {
+                        showInfo("Marked as paid: " + payment);
+                    }
+                });
+            }
         }
 
-        Scene popScene = new Scene(popRoot, 400, 400);
+        // Separator for recurring
+        Line recurringSeparator = new Line();
+        recurringSeparator.endXProperty().bind(popup.widthProperty().subtract(40));
+        recurringSeparator.setStyle("-fx-stroke: linear-gradient(to right, #001F3F, #2c3e50); -fx-stroke-width: 3;");
+        popRoot.getChildren().add(recurringSeparator);
+
+        Label recurringTitle = new Label("Recurring on the 1st of the month");
+        recurringTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
+        recurringTitle.setAlignment(Pos.CENTER);
+        popRoot.getChildren().add(recurringTitle);
+
+        // Recurring items (no checkboxes)
+        for (String payment : upcomingPayments) {
+            if (payment.contains("Monthly") || payment.contains("Dec 22, 2027")) {
+                Label recurringItem = new Label(payment);
+                recurringItem.setStyle("-fx-text-fill: #555; -fx-font-style: italic;");
+                popRoot.getChildren().add(recurringItem);
+            }
+        }
+
+        Scene popScene = new Scene(popRoot, 400, 500);
         popup.setScene(popScene);
         popup.showAndWait();
     }

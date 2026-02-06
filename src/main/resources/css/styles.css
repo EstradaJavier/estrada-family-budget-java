@@ -1,75 +1,50 @@
+/* Root background */
 .root {
     -fx-background-color: linear-gradient(to bottom right, #e6f0ff, #f0f7ff);
-    -fx-font-family: "Georgia", "Times New Roman", serif;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
     -fx-font-size: 14px;
 }
 
-/* Title */
+/* Main title - centered */
 .title-label {
-    -fx-font-size: 32px;
+    -fx-font-size: 36px;
     -fx-font-weight: bold;
-    -fx-text-fill: #001F3F;  /* Dark blue / navy */
+    -fx-text-fill: #001F3F;           /* Dark navy blue */
+    -fx-font-family: Georgia, "Times New Roman", serif;  /* Elegant serif font */
+    -fx-text-alignment: center;       /* Centers text inside the label */
+    -fx-alignment: center;            /* Centers label within container */
+    -fx-max-width: Infinity;          /* Fills available width for true centering */
+}
+
+/* Date / Temp header row */
+.header-box {
+    -fx-spacing: 100;
     -fx-alignment: center;
 }
 
-/* Summary Grid */
-.summary-grid {
-    -fx-alignment: center;
-    -fx-hgap: 30;
-    -fx-vgap: 10;
-}
-
-/* Summary Labels */
+/* Summary title */
 .summary-title {
-    -fx-font-size: 18px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #001F3F;
+    -fx-alignment: center;
 }
 
+/* Summary amounts */
 .summary-value {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
 
-/* Month Label */
-.month-label {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #001F3F;
-    -fx-alignment: center;
-}
-
-/* Radio Buttons - No color when not selected */
-.radio-button {
-    -fx-text-fill: #555;
-}
-
-.radio-button:selected .dot {
-    -fx-background-color: #001F3F;  /* Dark blue when selected */
-}
-
-.radio-button:selected .text {
-    -fx-font-weight: bold;
-    -fx-text-fill: #001F3F;
-}
-
-/* CheckBox - Darker when not selected */
-.check-box {
-    -fx-text-fill: #555;
-}
-
-.check-box:selected .mark {
-    -fx-background-color: #27ae60;  /* Green when checked */
-}
-
-/* ComboBox (Recurrence) - Darker when not focused */
-.combo-box {
-    -fx-background-color: #f8f9fa;
-    -fx-text-fill: #555;
-}
-
-.combo-box .list-cell {
-    -fx-text-fill: #555;
+/* Cards */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
+    -fx-padding: 20;
 }
 
 /* Buttons */
@@ -85,13 +60,38 @@
     -fx-background-color: #003366;
 }
 
-/* Card */
-.card {
-    -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-border-radius: 12;
-    -fx-border-color: #d0d0d0;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);
-    -fx-padding: 20;
+/* Form labels */
+.label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #001F3F;  /* Dark blue for Amount, Description, etc. */
+}
+
+/* Radio buttons - uncolored until selected */
+.radio-button {
+    -fx-text-fill: #555;
+}
+
+.radio-button:selected .dot {
+    -fx-background-color: #001F3F;
+}
+
+/* CheckBox */
+.check-box {
+    -fx-text-fill: #555;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #27ae60;
+}
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #555;
+}
+
+/* Separator lines */
+.separator {
+    -fx-stroke: linear-gradient(to right, #001F3F, #2c3e50);
+    -fx-stroke-width: 3;
 }
