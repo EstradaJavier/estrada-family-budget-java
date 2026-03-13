@@ -1,7 +1,5 @@
 # Estrada Family Budget App
 
-A personal desktop budgeting tool for the Estrada family. Tracks income (military retirement, disability, salaries), fixed/recurring expenses (DFAS deductions, former spouse support, credit cards, loans, subscriptions, pet care), and helps prevent overdrafts with upcoming payments visibility, projected balance simulator, and paid checkboxes.
-
 ## Features
 - **Monthly Summary** — Income, Expenses, Balance (vertically aligned with color coding)
 - **Current Balances** — Pop-up view (Sam’s Club, Citi, mortgage, Regions, Buckle, Cosco, AFEES, etc.)
