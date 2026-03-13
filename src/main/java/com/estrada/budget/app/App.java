@@ -46,7 +46,8 @@ public class App extends Application {
         loadDefaultBalances();
         loadUpcomingPayments();
 
-        // Header: Centered title + Date/Temp row + Separator
+        // === HEADER: Centered title + Date/Temp row + Separator ===
+        // Lines 62-85: This restores the centered "Estrada Family Budget" title exactly as before
         Label titleLabel = new Label("Estrada Family Budget");
         titleLabel.setStyle(
                 "-fx-font-size: 36px; " +
@@ -77,19 +78,19 @@ public class App extends Application {
         VBox content = new VBox(20);
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Monthly Summary Card
+        // Monthly Summary Card (ledger style)
         VBox summaryCard = createCard();
         summaryLabel = new Label();
         updateSummaryDisplay();
         summaryCard.getChildren().add(summaryLabel);
         content.getChildren().add(summaryCard);
 
-        // Pop-up Buttons
+        // Pop-up Buttons (restored)
         Button viewBalancesButton = new Button("View Current Balances");
         viewBalancesButton.setOnAction(e -> showBalancesPopUp());
         content.getChildren().add(viewBalancesButton);
 
-        Button viewUpcomingButton = new Button("View Upcoming Payments");
+        Button viewUpcomingButton = new Button("View Upcoming Payments/Deposits");
         viewUpcomingButton.setOnAction(e -> showUpcomingPopUp());
         content.getChildren().add(viewUpcomingButton);
 
@@ -217,6 +218,7 @@ public class App extends Application {
     }
 
     private void loadDefaultBalances() {
+        balances.add(new BalanceItem("RBFCU Checking", 3581.20)); // From Jan 2026 statement
         balances.add(new BalanceItem("Sam's Club Mastercard", 2558.83));
         balances.add(new BalanceItem("Citi Card", 6594.60));
         balances.add(new BalanceItem("Mortgage", 0.0));
@@ -227,15 +229,22 @@ public class App extends Application {
     }
 
     private void loadUpcomingPayments() {
-        upcomingPayments.add("Jan 15, 2026: Regions Bank $500.00");
-        upcomingPayments.add("Jan 30, 2026: DFAS Net Deposit $1,440.52 (income)");
-        upcomingPayments.add("Feb 7, 2026: Sam's Club Min $74.00");
+        upcomingPayments.add("Jan 15, 2026: Regions Bank Loan $500.00");
+        upcomingPayments.add("Jan 30, 2026: DFAS Net Pay Deposit $1,440.52 (Income)");
+        upcomingPayments.add("Feb 7, 2026: Sam's Club Min Payment $74.00");
         upcomingPayments.add("Feb 24, 2026: iCloud $2.99");
-        upcomingPayments.add("Dec 22, 2025: Citi Min $182.30");
-        upcomingPayments.add("Monthly: SBP Deduction $212.41");
-        upcomingPayments.add("Monthly: TriWest Health $63.75");
-        upcomingPayments.add("Monthly: Former Spouse $1,522.29");
-        upcomingPayments.add("Monthly: Fed Tax Withheld $18.03");
+        upcomingPayments.add("Dec 22, 2025: Citi Min Payment $182.30");
+        upcomingPayments.add("Monthly (1st): Mortgage $3,325.10");
+        upcomingPayments.add("Monthly (2nd): T-Mobile $243.13");
+        upcomingPayments.add("Monthly (5th): Veteran Energy $400.00");
+        upcomingPayments.add("Monthly (1st-5th): Salado Water $60.00");
+        upcomingPayments.add("Monthly (6th): Banfield Pet Hospital $146.30");
+        upcomingPayments.add("Monthly (1st): TriWest Health $63.75 (DFAS deduction)");
+        upcomingPayments.add("Monthly: SBP Deduction $212.41 (DFAS deduction)");
+        upcomingPayments.add("Monthly: Former Spouse $1,522.29 (DFAS deduction)");
+        upcomingPayments.add("Monthly: Fed Tax Withheld $18.03 (DFAS deduction)");
+        upcomingPayments.add("Monthly (end): VA Compensation Deposit $4,298.04");
+        upcomingPayments.add("Bi-weekly (7th/21st): Wife's Payroll (GREENSTATE) $1,620.00");
         upcomingPayments.add("Dec 22, 2027: Tractive Renewal $220.83");
     }
 
@@ -248,20 +257,21 @@ public class App extends Application {
         VBox summaryBox = new VBox(10);
         summaryBox.setAlignment(Pos.CENTER);
 
-        Label title = new Label("Budget Summary");
+        Label title = new Label("Monthly Summary");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
         summaryBox.getChildren().add(title);
 
         VBox amounts = new VBox(8);
-        amounts.setAlignment(Pos.CENTER);
+        amounts.setAlignment(Pos.CENTER_LEFT);
+        amounts.setPadding(new Insets(0, 0, 0, 40)); // Tab over to right for ledger look
 
-        Label incLine = new Label("Income: $" + String.format("%.2f", income));
+        Label incLine = new Label("Income:          $" + String.format("%.2f", income));
         incLine.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
 
-        Label expLine = new Label("Expenses: $" + String.format("%.2f", expense));
+        Label expLine = new Label("Expenses:       $" + String.format("%.2f", expense));
         expLine.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e74c3c;");
 
-        Label balLine = new Label("Balance: $" + String.format("%.2f", balance));
+        Label balLine = new Label("Balance:         $" + String.format("%.2f", balance));
         balLine.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         if (balance >= 0) {
             balLine.setStyle(balLine.getStyle() + " -fx-text-fill: #27ae60;");
@@ -311,7 +321,7 @@ public class App extends Application {
             }
         });
 
-        // Buttons at bottom
+        // Buttons at bottom (restored)
         Button addButton = new Button("Add New Balance Item");
         addButton.setOnAction(e -> addNewBalanceItem(observableBalances));
 
@@ -332,7 +342,7 @@ public class App extends Application {
         buttons.setAlignment(Pos.CENTER);
 
         popRoot.getChildren().addAll(
-                new Label("Current account balances (click to edit, double-click for quick edit)"),
+                new Label("Current account balances (click to select, double-click to edit)"),
                 balanceList,
                 buttons
         );
@@ -341,6 +351,7 @@ public class App extends Application {
         popup.setScene(popScene);
         popup.showAndWait();
 
+        // Update main balances list after popup closes
         balances.clear();
         balances.addAll(observableBalances);
     }
@@ -392,19 +403,20 @@ public class App extends Application {
     private void showUpcomingPopUp() {
         Stage popup = new Stage();
         popup.initModality(Modality.APPLICATION_MODAL);
-        popup.setTitle("Upcoming Payments");
+        popup.setTitle("Upcoming Payments/Deposits");
 
-        VBox popRoot = new VBox(10);
+        VBox popRoot = new VBox(15);
         popRoot.setPadding(new Insets(15));
         popRoot.setStyle("-fx-background-color: white;");
 
-        // One-time payments with checkboxes
-        Label oneTimeLabel = new Label("One-time / Upcoming Bills");
-        oneTimeLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
-        popRoot.getChildren().add(oneTimeLabel);
+        // Upcoming Bills with checkboxes
+        Label upcomingTitle = new Label("Upcoming Bills");
+        upcomingTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
+        upcomingTitle.setAlignment(Pos.CENTER);
+        popRoot.getChildren().add(upcomingTitle);
 
         for (String payment : upcomingPayments) {
-            if (!payment.contains("Monthly") && !payment.contains("Dec 22, 2027")) {
+            if (!payment.contains("Monthly") && !payment.contains("Bi-weekly") && !payment.contains("Deposit")) {
                 CheckBox checkBox = new CheckBox(payment);
                 popRoot.getChildren().add(checkBox);
                 checkBox.selectedProperty().addListener((obs, old, newVal) -> {
@@ -421,21 +433,22 @@ public class App extends Application {
         recurringSeparator.setStyle("-fx-stroke: linear-gradient(to right, #001F3F, #2c3e50); -fx-stroke-width: 3;");
         popRoot.getChildren().add(recurringSeparator);
 
-        Label recurringTitle = new Label("Recurring on the 1st of the month");
-        recurringTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
+        Label recurringTitle = new Label("Recurring Payments");
+        recurringTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #001F3F;");
         recurringTitle.setAlignment(Pos.CENTER);
         popRoot.getChildren().add(recurringTitle);
 
         // Recurring items (no checkboxes)
         for (String payment : upcomingPayments) {
-            if (payment.contains("Monthly") || payment.contains("Dec 22, 2027")) {
+            if (payment.contains("Monthly") || payment.contains("Bi-weekly") && !payment.contains("Deposit")) {
                 Label recurringItem = new Label(payment);
                 recurringItem.setStyle("-fx-text-fill: #555; -fx-font-style: italic;");
+                recurringItem.setAlignment(Pos.CENTER);
                 popRoot.getChildren().add(recurringItem);
             }
         }
 
-        Scene popScene = new Scene(popRoot, 400, 500);
+        Scene popScene = new Scene(popRoot, 500, 600);
         popup.setScene(popScene);
         popup.showAndWait();
     }

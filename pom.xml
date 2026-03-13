@@ -8,84 +8,75 @@
     <artifactId>family-budget</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>Estrada Family Budget App</name>
-    <description>Desktop family budget tracker with JavaFX</description>
-
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>21</maven.compiler.source>  <!-- or 25 if you picked JDK 25 -->
+        <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <javafx.version>25.0.2</javafx.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
-        <!-- JavaFX Core Modules -->
+        <!-- JavaFX dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
 
-        <!-- Jackson Java 8 Date/Time support (for LocalDate, YearMonth, etc.) -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.17.2</version>  <!-- Matches your jackson-databind version; latest stable as of early 2026 -->
-        </dependency>
-
-        <!-- JSON Persistence -->
+        <!-- Jackson for JSON persistence -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.17.2</version>  <!-- Latest stable as of now -->
+            <version>2.15.2</version>
         </dependency>
 
-        <!-- CSV Export -->
+        <!-- OpenCSV for CSV export -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.10</version>
+            <version>5.8</version>
         </dependency>
 
-        <!-- Testing -->
+        <!-- PDFBox for PDF parsing -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.11.0</version>
-            <scope>test</scope>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.1</version>
         </dependency>
-    </dependencies>
+
+        <!-- Jackson JavaTime module for LocalDate / LocalDateTime support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.15.2</version>  <!-- Match your jackson-databind version -->
+        </dependency>    </dependencies>
 
     <build>
         <plugins>
-            <!-- JavaFX Run Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.estrada.budget.app.App</mainClass>  <!-- Matches our structure -->
-                </configuration>
-            </plugin>
-
-            <!-- Compiler Plugin (ensures Java version) -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>25</source>
-                    <target>25</target>
+                    <mainClass>com.estrada.budget.app.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>

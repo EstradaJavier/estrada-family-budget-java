@@ -1,27 +1,38 @@
 package com.estrada.budget.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Budget {
 
-    private YearMonth currentMonth = YearMonth.now();  // Always initialized
+    private YearMonth currentMonth = YearMonth.now();
     private Map<String, Category> categories = new HashMap<>();
     private List<Transaction> transactions = new ArrayList<>();
 
     public Budget() {
-        this.currentMonth = YearMonth.now();  // Double safety
-        // Default categories (feel free to change/add)
-        addCategory(new Category("Groceries", 800.0));
-        addCategory(new Category("Rent/Mortgage", 1500.0));
-        addCategory(new Category("Utilities", 300.0));
-        addCategory(new Category("Salary", 5000.0));
-        addCategory(new Category("Entertainment", 200.0));
-        addCategory(new Category("Transportation", 400.0));
+        this.currentMonth = YearMonth.now();
+
+        // Updated categories from your February statement + dog training
+        addCategory(new Category("Javier's Military Retirement", 4298.00));
+        addCategory(new Category("Alesha's Payroll", 3608.00));
+        addCategory(new Category("Tax Refunds / Other Income", 0.00));
+
+        addCategory(new Category("Mortgage", 3303.00));
+        addCategory(new Category("Amazon / Online Shopping", 400.00));
+        addCategory(new Category("Pet Care", 200.00));
+        addCategory(new Category("Pet Training / Boarding", 0.00));   // ← For Darious & Bear
+        addCategory(new Category("Subscriptions & Streaming", 100.00));
+        addCategory(new Category("T-Mobile", 262.00));
+        addCategory(new Category("Groceries", 650.00));
+        addCategory(new Category("Dining Out / Fast Food", 250.00));
+        addCategory(new Category("Utilities", 380.00));
+        addCategory(new Category("Credit Card Payments", 500.00));
+        addCategory(new Category("Former Spouse Support", 1522.00));
+        addCategory(new Category("SBP Costs", 212.00));
+        addCategory(new Category("Health Insurance / TriWest", 64.00));
+        addCategory(new Category("Miscellaneous", 300.00));
     }
 
     public void addCategory(Category category) {
@@ -33,78 +44,33 @@ public class Budget {
     public void addTransaction(Transaction t) {
         if (t != null) {
             transactions.add(t);
-            if (t.getType() == Transaction.TransactionType.EXPENSE) {
-                Category cat = categories.get(t.getCategoryName());
-                if (cat != null) {
-                    cat.addSpent(t.getAmount());
-                }
+            if (t.getType() == Transaction.TransactionType.INCOME) {
+                // Income does nothing to categories
+            } else {
+                Category cat = categories.get(t.getCategory());
+                if (cat != null) cat.addSpent(t.getAmount());
             }
         }
-    }
-
-    // Apply recurring transactions for the current month (called in getMonthlySummary)
-    public void applyRecurringForMonth(YearMonth month) {
-        LocalDate monthStart = month.atDay(1);
-        LocalDate monthEnd = month.atEndOfMonth();
-
-        List<Transaction> recurring = transactions.stream()
-                .filter(Transaction::isRecurring)
-                .filter(t -> t.getRecurrenceType() != null)
-                .filter(t -> t.isActiveOn(monthEnd))  // Still active
-                .toList();
-
-        for (Transaction base : recurring) {
-            LocalDate next = base.getDate();
-            while (next.isBefore(monthStart) || next.isEqual(monthStart)) {
-                next = calculateNextDate(next, base.getRecurrenceType());
-            }
-            while (!next.isAfter(monthEnd)) {
-                Transaction copy = new Transaction(
-                        base.getAmount(),
-                        next,
-                        base.getDescription() + " (recurring)",
-                        base.getType(),
-                        base.getCategoryName()
-                );
-                copy.setRecurring(true);
-                copy.setRecurrenceType(base.getRecurrenceType());
-                copy.setRecurringEndDate(base.getRecurringEndDate());
-                addTransaction(copy);
-                next = calculateNextDate(next, base.getRecurrenceType());
-            }
-        }
-    }
-
-    private LocalDate calculateNextDate(LocalDate current, Transaction.RecurrenceType type) {
-        return switch (type) {
-            case WEEKLY  -> current.plusWeeks(1);
-            case MONTHLY -> current.plusMonths(1);
-            case YEARLY  -> current.plusYears(1);
-        };
     }
 
     public Map<String, Object> getMonthlySummary() {
-        applyRecurringForMonth(currentMonth);  // Ensure recurring are applied
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
 
-        double totalIncome = transactions.stream()
-                .filter(t -> t.getType() == Transaction.TransactionType.INCOME)
-                .filter(t -> YearMonth.from(t.getDate()).equals(currentMonth))
-                .mapToDouble(Transaction::getAmount)
-                .sum();
-
-        double totalExpense = transactions.stream()
-                .filter(t -> t.getType() == Transaction.TransactionType.EXPENSE)
-                .filter(t -> YearMonth.from(t.getDate()).equals(currentMonth))
-                .mapToDouble(Transaction::getAmount)
-                .sum();
+        for (Transaction t : transactions) {
+            if (t.getType() == Transaction.TransactionType.INCOME) {
+                totalIncome += t.getAmount();
+            } else {
+                totalExpense += t.getAmount();
+            }
+        }
 
         double balance = totalIncome - totalExpense;
 
-        Map<String, Double> categorySpent = categories.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().getSpentThisMonth()
-                ));
+        Map<String, Double> categorySpent = new HashMap<>();
+        for (Map.Entry<String, Category> entry : categories.entrySet()) {
+            categorySpent.put(entry.getKey(), entry.getValue().getSpentThisMonth());
+        }
 
         Map<String, Object> summary = new HashMap<>();
         summary.put("month", currentMonth.toString());
@@ -112,10 +78,14 @@ public class Budget {
         summary.put("expense", totalExpense);
         summary.put("balance", balance);
         summary.put("categorySpent", categorySpent);
+
+        summary.put("safetyWarning", balance < 1000 ?
+                "⚠️ WARNING: Projected balance may drop below safe buffer ($1,000)!" :
+                "✅ Safe buffer maintained");
+
         return summary;
     }
 
-    // Getters
     public YearMonth getCurrentMonth() { return currentMonth; }
     public void setCurrentMonth(YearMonth currentMonth) {
         this.currentMonth = (currentMonth != null) ? currentMonth : YearMonth.now();
